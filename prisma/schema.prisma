@@ -7,7 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum EventStatus {
+  SCHEDULED
+  CANCELLED
+}
 
+enum BookingStatus {
+  CONFIRMED
+  PENDING_PAYMENT
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  CASH
+}
 
 model User {
   id           String   @id @default(uuid()) @map("user_id")
@@ -18,7 +34,83 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  bookings Booking[]
 
   @@map("Users")
 }
 
+model Venue {
+  id       String @id @default(uuid()) @map("venue_id")
+  name     String
+  address  String
+  city     String
+  capacity Int
+
+  events Event[]
+
+  @@map("Venues")
+}
+
+model Event {
+  id              String      @id @default(uuid()) @map("event_id")
+  venueId         String      @map("venue_id")
+  name            String
+  description     String
+  dateTime        DateTime    @map("date_time")
+  durationMinutes Int         @map("duration_minutes")
+  status          EventStatus
+
+  venue       Venue        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  ticketTypes TicketType[]
+
+  @@index([venueId])
+  @@map("Events")
+}
+
+model TicketType {
+  id                String  @id @default(uuid()) @map("ticket_type_id")
+  eventId           String  @map("event_id")
+  name              String
+  price             Decimal @db.Decimal(10, 2)
+  totalQuantity     Int     @map("total_quantity")
+  quantityAvailable Int     @map("quantity_available")
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookingItems BookingItem[]
+
+  @@index([eventId])
+  @@map("TicketTypes")
+}
+
+model Booking {
+  id            String        @id @default(uuid()) @map("booking_id")
+  userId        String        @map("user_id")
+  bookingDate   DateTime      @default(now()) @map("booking_date")
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
+  status        BookingStatus
+  paymentMethod PaymentMethod @map("payment_method")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookingItems BookingItem[]
+
+  @@index([userId])
+  @@map("Bookings")
+}
+
+model BookingItem {
+  id             String  @id @default(uuid()) @map("booking_item_id")
+  bookingId      String  @map("booking_id")
+  ticketTypeId   String  @map("ticket_type_id")
+  quantityBooked Int     @map("quantity_booked")
+  unitPrice      Decimal @map("unit_price") @db.Decimal(10, 2)
+  subtotal       Decimal @db.Decimal(10, 2)
+
+  booking    Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([ticketTypeId])
+  @@map("BookingItems")
+}
