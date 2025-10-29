@@ -7,10 +7,18 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+    const userWithoutPassword = { ...users };
+    delete (userWithoutPassword as Partial<User>).passwordHash;
+    return users.map(() => userWithoutPassword);
+  }
 
   async updateUserProfile(
     userId: string,

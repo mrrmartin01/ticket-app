@@ -124,6 +124,7 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      role: user.role,
     };
 
     return { ...tokens, user: safeUser };
@@ -219,6 +220,7 @@ interface AuthUser {
   email: string;
   firstName: string;
   lastName: string;
+  role: string;
 }
 
 interface AuthSignInResponse extends Tokens {

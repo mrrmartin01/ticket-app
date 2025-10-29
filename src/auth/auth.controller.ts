@@ -36,6 +36,7 @@ export class AuthController {
       email: string;
       firstName: string;
       lastName: string;
+      role: string;
     };
   }> {
     const { access_token, refresh_token, user } =
