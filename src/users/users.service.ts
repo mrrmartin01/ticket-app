@@ -7,17 +7,31 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    const users = await this.prisma.user.findMany();
-    const userWithoutPassword = { ...users };
-    delete (userWithoutPassword as Partial<User>).passwordHash;
-    return users.map(() => userWithoutPassword);
+  async getAllUsers(limit = 10, cursor?: string) {
+    const users = await this.prisma.user.findMany({
+      take: limit,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      orderBy: [{ id: 'desc' }],
+    });
+    const userWithoutPassword = users.map(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ({ passwordHash: _passwordHash, ...user }) => user,
+    );
+    const nextCursor =
+      users.length === limit ? users[users.length - 1].id : null;
+    return {
+      data: userWithoutPassword,
+      meta: {
+        nextCursor,
+        hasMore: !!nextCursor,
+      },
+    };
   }
 
   async updateUserProfile(

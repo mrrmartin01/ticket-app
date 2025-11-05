@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
@@ -23,7 +23,10 @@ export class UsersController {
 
   @Auth()
   @Get('all')
-  async getAllUsers() {
-    return this.userService.findAll();
+  async getAllUsers(
+    @Query('limit') limit = 10,
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.userService.getAllUsers(Number(limit), cursor);
   }
 }
