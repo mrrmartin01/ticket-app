@@ -185,8 +185,8 @@ PORT=3000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ticket_app?schema=public
 JWT_SECRET=replace-with-strong-secret
 JWT_EXPIRES_IN=1d
-PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxx
 PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxx
+PAYSTACK_BASE_URL=https://exampleAtYourDomain.com
 ```
 
 ## Payment Integration
@@ -238,12 +238,14 @@ Manual operations:
 
 - Swagger is served at: `http://localhost:3000/api/docs`
 - Explore endpoints for `auth`, `users`, `event`, `ticket`, `booking`, `payment`, `venue`.
+- Postman collection available at [Postman Collection](docs/postman_collection.json) (import into Postman).
+  Add this evironment for easy testing: {{apiURL}} = http://localhost:3000.
 
 Example: create booking
 
 ```http
 POST /booking
-Authorization: Bearer <token>
+Cookie: access_token=<access_token>; refresh_token=<refresh_token>
 Content-Type: application/json
 
 {

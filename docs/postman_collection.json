@@ -1,0 +1,739 @@
+{
+	"info": {
+		"_postman_id": "7a701004-2c41-467b-9a0a-c033aa41b9cc",
+		"name": "Ticket",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32687483"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"TestPassword69@\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/auth/signin",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"TestPassword69@\",\r\n    \"firstName\": \"Tester\",\r\n    \"lastName\": \"Userman\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/auth/signup",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh-token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"TestPassword\"\r\n}"
+						},
+						"url": {
+							"raw": "{{apiURL}}/auth/refresh",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/auth/signout",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"auth",
+								"signout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"TestPassword\"\r\n}"
+						},
+						"url": {
+							"raw": "{{apiURL}}/users/profile",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Fresh\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/users/update-profile",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"users",
+								"update-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-user (admin)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Fresh\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/users/all?limit=10",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"users",
+								"all"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "venue",
+			"item": [
+				{
+					"name": "new venue",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Site 25\",\r\n    \"address\": \"88 Main Street\",\r\n    \"city\": \"Alorum world\",\r\n    \"capacity\": 707000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/venue/create",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"venue",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit venue",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"capacity\": 12000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/venue/edit/10815cfe-4d2e-4c86-8fdb-d09d5cad1b4d",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"venue",
+								"edit",
+								"10815cfe-4d2e-4c86-8fdb-d09d5cad1b4d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get venue (1)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/venue/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"venue",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10815cfe-4d2e-4c86-8fdb-d09d5cad1b4d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get venues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/venue/all?limit=10",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"venue",
+								"all"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "events",
+			"item": [
+				{
+					"name": "get events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/event/all?limit=10 ",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"all"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10 "
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get venue events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/event/venue/:venueId?limit=10 ",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"venue",
+								":venueId"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10 "
+								}
+							],
+							"variable": [
+								{
+									"key": "venueId",
+									"value": "10815cfe-4d2e-4c86-8fdb-d09d5cad1b4d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get event (1)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/event/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1dc4c215-86b2-4cab-a7da-9361b7747105"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/event/delete/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1dc4c215-86b2-4cab-a7da-9361b7747105"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore deleted event",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/event/restore/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"restore",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1dc4c215-86b2-4cab-a7da-9361b7747105"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"venueId\": \"f32d0d24-018b-472b-8458-36aea11ccda2\",\r\n  \"name\": \"Badman gangster Awards\",\r\n  \"description\": \"The annual event organized for real bad men\",\r\n  \"dateTime\": \"2025-11-03T16:20:00Z\",\r\n  \"durationMinutes\": 40\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/event/create",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit event",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"dateTime\": \"2025-11-03T22:30:00Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/event/edit/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"event",
+								"edit",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1dc4c215-86b2-4cab-a7da-9361b7747105"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ticket",
+			"item": [
+				{
+					"name": "create ticket",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"VIP\",\r\n    \"price\": 120.5,\r\n    \"totalQuantity\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/tickets/create/:eventId/",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								"create",
+								":eventId",
+								""
+							],
+							"variable": [
+								{
+									"key": "eventId",
+									"value": "515cb8cb-d983-405d-82ad-c09d118cfec4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "event tickets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/tickets/event/:eventId/",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								"event",
+								":eventId",
+								""
+							],
+							"variable": [
+								{
+									"key": "eventId",
+									"value": "1dc4c215-86b2-4cab-a7da-9361b7747105"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/tickets/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "329c82f0-7a34-4e43-ba5e-eff363592aca"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit ticket",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"totalQuantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/tickets/edit/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								"edit",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "329c82f0-7a34-4e43-ba5e-eff363592aca"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete ticket",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/tickets/delete/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "329c82f0-7a34-4e43-ba5e-eff363592aca"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore ticket",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/tickets/restore/:id",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"tickets",
+								"restore",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "329c82f0-7a34-4e43-ba5e-eff363592aca"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "booking",
+			"item": [
+				{
+					"name": "create booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"paymentMethod\": \"CARD\",\r\n    \"items\": [\r\n        {\r\n            \"ticketTypeId\": \"40b07e1f-da2d-47eb-81d0-bb9c73727aed\",\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}/booking",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment-verification",
+			"item": [
+				{
+					"name": "verify booking payment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}/payment/callback?reference=17ca07be-4528-4a59-b126-bb8dd0fd9f61",
+							"host": [
+								"{{apiURL}}"
+							],
+							"path": [
+								"payment",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "reference",
+									"value": "17ca07be-4528-4a59-b126-bb8dd0fd9f61"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
