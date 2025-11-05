@@ -1,7 +1,15 @@
-import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import { BookingService } from 'src/booking/booking.service';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('payment')
 @ApiTags('Payment Module')
 export class PaymentController {

@@ -1,98 +1,312 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <strong>Ticket App</strong> — backend API for creating events, issuing tickets, booking seats, and processing payments.
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  <a href="#api-documentation">Swagger Docs</a> •
+  <a href="#setup-instructions">Setup</a> •
+  <a href="#payment-integration">Payments</a> •
+  <a href="#deployment">Deployment</a>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Project Overview
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Ticket App is a NestJS backend that powers event ticketing:
+- Users browse events, book tickets, and pay securely via Paystack.
+- Admins manage venues, events, tickets, and oversee bookings/payments.
 
-## Project setup
+**Problem it solves**: streamlines end‑to‑end ticketing (catalog → booking → payment → verification) with clear roles, auditability, and reliable state transitions.
+
+## Tech Stack and Dependencies
+
+- **Backend**: NestJS 11 (TypeScript)
+- **ORM/DB**: Prisma 6 + PostgreSQL (`pg`)
+- **Auth**: JWT (`@nestjs/jwt`, `passport-jwt`), guards for admin access
+- **Payments**: Paystack (`paystack-api`)
+- **Config/Validation**: `@nestjs/config`, `class-validator`, `class-transformer`
+- **Docs**: `@nestjs/swagger`, `swagger-ui-express` (served at `/api/docs`)
+- **Testing**: Jest, Supertest
+- **Runtime**: Node.js 22+, Yarn
+- **Optional infra**: Docker Compose example (Postgres + app) below
+
+## System Architecture
+
+High-level modules and interactions:
+- `auth`: sign up/in, JWT issuance, guards/strategies
+- `users`: user profile/admin operations
+- `venue`, `event`, `ticket`: domain CRUD and validation
+- `booking`: create bookings, manage lifecycle
+- `payment`: initialize charge, verify, webhook handling
+- `prisma`: database access via `PrismaService`
+
+Request flow (typical booking): Client → `booking` → `payment.initialize` → redirect to Paystack → Paystack callback/webhook → `payment.verify` → `booking` status update → response.
+
+Diagrams:
+- Sequence diagram: add `docs/flow-sequence.png` and reference it here.
+- ERD: export from Prisma to `docs/erd.png` and link it here.
+
+## Setup Instructions
+
+### 1) Clone and install
 
 ```bash
-$ yarn install
+git clone https://github.com/mrrmartin01/ticket-app
+cd ticket-app
+yarn install
 ```
 
-## Compile and run the project
+### 2) Environment variables
+
+Copy and edit `.env` (see full list in Environment Variables section):
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+Minimal required for local dev:
+
+```dotenv
+NODE_ENV=development
+PORT=3000
+
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ticket_app?schema=public"
+
+JWT_SECRET=replace-with-strong-secret
+JWT_EXPIRES_IN=1d
+
+PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxx
+PAYSTACK_BASE_URL=https://exampleAtYourDomain.com
+# Optional: If you prefer a separate webhook key, keep using SECRET_KEY; Paystack uses x-paystack-signature derived from the same secret.
+```
+
+### 3) Database setup (Prisma + Postgres)
+
+Run migrations to create schema:
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn prisma migrate dev
 ```
+
+Optional (no-op if you always use migrate):
+
+```bash
+yarn prisma db push
+```
+
+Seeding (if/when a seed script is added):
+
+```bash
+yarn prisma db seed
+```
+
+### 4) Start servers
+
+```bash
+# development (hot reload)
+yarn start:dev
+
+# production build + run
+yarn build
+yarn start:prod
+```
+
+## Optional: Docker (Postgres + App)
+
+Create `docker-compose.yml` in the project root:
+
+```yaml
+version: '3.9'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ticket_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    command: yarn start:dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/ticket_app?schema=public
+      JWT_SECRET: change-me
+      JWT_EXPIRES_IN: 1d
+      PAYSTACK_PUBLIC_KEY: pk_test_xxx
+      PAYSTACK_SECRET_KEY: sk_test_xxx
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  dbdata:
+```
+
+Then:
+
+```bash
+docker compose up -d --build
+```
+
+## Testing
+
+```bash
+yarn test        # unit tests
+yarn test:e2e    # e2e tests
+yarn test:cov    # coverage
+```
+
+- Mock external calls (Paystack) by stubbing the client or HTTP layer.
+- Prefer factory/fixtures for entities; use a separate test DB.
+- Seed test data by running a dedicated test seed or factory bootstrap.
+
+## Environment Variables
+
+Required variables and purpose:
+
+- `PORT`: API port
+- `DATABASE_URL`: Prisma connection string to Postgres
+- `JWT_SECRET`: HMAC secret for JWT signing
+- `JWT_EXPIRES_IN`: JWT expiration (e.g. `1d`, `3600s`)
+- `PAYSTACK_PUBLIC_KEY`: Paystack public key (test: `pk_test_...`)
+- `PAYSTACK_SECRET_KEY`: Paystack secret key (test: `sk_test_...`)
+
+Example `.env` file:
+
+```dotenv
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ticket_app?schema=public
+JWT_SECRET=replace-with-strong-secret
+JWT_EXPIRES_IN=1d
+PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxx
+PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxx
+```
+
+## Payment Integration
+
+Flow (Paystack):
+1. Initialize transaction on backend (`payment` module) with amount, email, reference.
+2. Return authorization URL to client; client redirects user to Paystack.
+3. On success/cancel, Paystack redirects to your callback URL; backend also receives a webhook.
+4. Verify transaction on backend (server-to-server) and update booking status.
+
+Test/Sandbox:
+- Use test keys (`pk_test_*`, `sk_test_*`).
+- Use Paystack test cards from their docs.
+
+Webhook verification:
+- Paystack sends `x-paystack-signature` (HMAC SHA512 of raw request body using your secret key).
+- Compute HMAC (hex) over the raw body with `PAYSTACK_SECRET_KEY` and compare to header. Reject if mismatch.
+
+Reference guidelines:
+- Make references unique and idempotent, e.g. `booking_<bookingId>_<timestamp>`.
+- Store reference on your `booking`/`payment` record and only accept a reference once.
+
+## Roles and Permissions
+
+Roles:
+- `USER`: can register/login, view events, create bookings, pay.
+- `ADMIN`: full CRUD for venues, events, tickets; view/resolve payments and bookings.
+
+AuthN/Z:
+- JWT-based authentication (Bearer token).
+- Guards enforce authentication; admin guard protects admin-only routes.
+
+## Booking Lifecycle
+
+Statuses:
+- `pending`: booking created, awaiting payment.
+- `confirmed`: payment verified; inventory decremented and booking finalized.
+- `failed`: payment failed/expired or verification invalid.
+
+Transitions:
+- Create booking → `pending`.
+- On successful Paystack verify/webhook → `confirmed`.
+- On failure/timeout/verification mismatch → `failed`.
+
+Manual operations:
+- Admin can re-verify a reference, retry verification, or mark a disputed booking for review.
+
+## API Documentation
+
+- Swagger is served at: `http://localhost:3000/api/docs`
+- Explore endpoints for `auth`, `users`, `event`, `ticket`, `booking`, `payment`, `venue`.
+
+Example: create booking
+
+```http
+POST /booking
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "eventId": "<uuid>",
+  "ticketTypeId": "<uuid>",
+  "quantity": 2
+}
+```
+
+Error response format example:
+
+```json
+{
+  "statusCode": 400,
+  "message": ["quantity must be a positive number"],
+  "error": "Bad Request"
+}
+```
+
+## Database Schema
+
+- Managed with Prisma; see `prisma/schema.prisma` and `prisma/migrations/`.
+- Use `yarn prisma migrate dev` for local changes; `yarn prisma migrate deploy` in CI/CD.
+- Rollback by creating a new corrective migration; avoid force-reset in production.
+- Seed strategy: add a `prisma/seed.ts` and wire `package.json` → `prisma.db.seed`.
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Environment setup:
+- Provide `.env` with production credentials and strong secrets.
+- Run `yarn build` and `yarn start:prod` behind a reverse proxy (HTTPS).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+CI/CD (example):
+- On push to `main`: install deps, run tests, `prisma migrate deploy`, build, deploy container.
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
+Health & monitoring:
+- Expose a health endpoint (e.g. `/health`) and wire to your load balancer checks.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Monitoring and Logging
 
-## Resources
+- Centralize logs (e.g., Winston + JSON) and forward to your log aggregator.
+- Track errors and failed transactions; alert on verification failures.
+- Optional integrations: Sentry, Datadog, Grafana/Loki, Prometheus.
 
-Check out a few resources that may come in handy when working with NestJS:
+## Security Practices
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Enforce HTTPS and secure headers (HSTS, no sniff, XSS protection).
+- Do not log PII/secrets; rotate `JWT_SECRET` and API keys.
+- Store secrets via your cloud secret manager rather than plaintext.
 
-## Support
+## Contributing and License
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Development hygiene:
+- Lint & format: `yarn lint` and `yarn format`.
+- Branch naming: `feature/…`, `fix/…`, `chore/…`.
+- Conventional commits recommended.
 
-## Stay in touch
+License: UNLICENSED (see `package.json`). Provide contact/maintainer details in your fork as needed.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Additional Recommendations
 
-## License
+- Add screenshots or a short demo GIF of core flows.
+- Add build/test/coverage badges.
+- Keep a `CHANGELOG.md` or GitHub Releases.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
