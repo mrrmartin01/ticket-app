@@ -7,12 +7,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PaymentService } from 'src/payment/payment.service';
 import { Prisma, BookingStatus } from '@prisma/client';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BookingService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paymentService: PaymentService,
+    private readonly config: ConfigService,
   ) {}
 
   async createBooking(dto: CreateBookingDto, userId: string) {
@@ -123,7 +125,9 @@ export class BookingService {
 
     // Handle payment if totalAmount > 0
     if (totalAmount > 0) {
-      const callbackUrl = 'https://car-wash-gray.vercel.app/'; // URL after successful payment
+      const callbackUrl = this.config.getOrThrow<string>(
+        'PAYSTACK_CALLBACK_URL',
+      );
       const payment = await this.paymentService.initializePayment(
         booking,
         user.firstName + ' ' + user.lastName,
